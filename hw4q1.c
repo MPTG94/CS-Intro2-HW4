@@ -28,7 +28,7 @@ void print_array(int a[N][M], int n, int m);
  -------------------------------------------------------------------------*/
 
 
-int main0() {
+int main() {
     int n = 0, m = 0;
     printf("Enter image dimensions:\n");
     scanf("%d%d", &n, &m);
@@ -99,58 +99,68 @@ void compute_integral_image(int image[][M], int n, int m, int integral_image[][M
 
 int sum_rect(int integral_image[][M], int rect[RECT]) {
     // Calculate the correct value according to the formula
-    int topLeft = 0;
-    int topRight = 0;
-    int bottomLeft = 0;
-    int bottomRight = 0;
-    if (rect[TOP] == -1 ) {
-        topLeft = 0;
-        if (rect[RIGHT] == -1) {
-            topRight = integral_image[0][m-1];
+    int sum = 0;
+    if (rect[TOP] == 0) {
+        if (rect[LEFT] == 0) {
+            // Top and left will overflow
+            sum = integral_image[rect[BOTTOM]][rect[RIGHT]];
         } else {
-            topRight = integral_image[0][rect[RIGHT]];
+            // Top will overflow
+            int bottomRight = integral_image[rect[BOTTOM]][rect[RIGHT]];
+            int bottomLeft = integral_image[rect[BOTTOM]][rect[LEFT] - 1];
+            sum = bottomRight - bottomLeft;
         }
     } else {
-        topLeft = integral_image[rect[TOP]][rect[LEFT]];
+        if (rect[LEFT] == 0) {
+            // Left will overflow
+            int bottomRight = integral_image[rect[BOTTOM]][rect[RIGHT]];
+            int topRight = integral_image[rect[TOP] - 1][rect[RIGHT]];
+            sum = bottomRight - topRight;
+        } else {
+            // No overflows, calculate full sum
+            int bottomRight = integral_image[rect[BOTTOM]][rect[RIGHT]];
+            int bottomLeft = integral_image[rect[BOTTOM]][rect[LEFT] - 1];
+            int topRight = integral_image[rect[TOP] - 1][rect[RIGHT]];
+            int topLeft = integral_image[rect[TOP] - 1][rect[LEFT] - 1];
+            sum = bottomRight - topRight - bottomLeft + topLeft;
+        }
     }
-
-
-    return integral_image[rect[BOTTOM]][rect[RIGHT]] - integral_image[rect[TOP] - 1][rect[RIGHT]] - integral_image[rect[BOTTOM]][rect[LEFT] - 1] +
-           integral_image[rect[TOP] - 1][rect[LEFT] - 1];
+    return sum;
 }
 
 void sliding_average(int integral_image[][M], int n, int m, int h, int w, int average[][M]) {
-    int avg = 0;
     int hDiv = h / 2;
     int wDiv = w / 2;
-    int rect[RECT];
+    int rect[RECT] = {0};
     for (int i = 0; i < n; ++i) {
         for (int j = 0; j < m; ++j) {
             if (i - hDiv - 1 < 0) {
                 // Top will overflow
-                rect[TOP] = -1;
+                rect[TOP] = 0;
             } else {
-                rect[TOP] = i - hDiv - 1;
+                rect[TOP] = i - hDiv;
             }
             if (j - wDiv - 1 < 0) {
                 // Left will overflow
-                rect[LEFT] = -1;
+                rect[LEFT] = 0;
             } else {
-                rect[LEFT] = j - wDiv - 1;
+                rect[LEFT] = j - wDiv;
             }
             if (i + hDiv >= n) {
                 // Bottom will overflow
-                rect[BOTTOM] = -1;
+                rect[BOTTOM] = n - 1;
             } else {
                 rect[BOTTOM] = i + hDiv;
             }
             if (j + wDiv >= m) {
                 // Right will overflow
-                rect[RIGHT] = -1;
+                rect[RIGHT] = m - 1;
             } else {
                 rect[RIGHT] = j + wDiv;
             }
-            average[i][j] = round(sum_rect(integral_image, rect) / (h * w));
+            double slidingWindowAverage = (double) sum_rect(integral_image, rect) / (h * w);
+            int roundedAverage = round(slidingWindowAverage);
+            average[i][j] = roundedAverage;
         }
     }
 }

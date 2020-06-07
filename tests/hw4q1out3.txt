@@ -1,0 +1,17 @@
+Enter image dimensions:
+Enter image:
+Enter sliding window dimensions:
+Integral image is:
+31 33 37 70 75 111
+43 71 84 127 161 222
+56 101 135 200 254 333
+80 148 197 278 346 444
+110 186 263 371 450 555
+111 222 333 444 555 666
+Smoothed image is:
+8 9 9 10 15 11
+11 15 16 17 22 15
+13 18 18 17 19 14
+13 20 20 19 17 10
+13 22 21 20 15 10
+8 15 15 15 10 6

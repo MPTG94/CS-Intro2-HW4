@@ -14,13 +14,13 @@ int main()
         printf("The answer to question 2 is r\n");
         break;
     case 3 :
-        printf("The answer to question 3 is p\n");
+        printf("The answer to question 3 is h\n");
         break;
     case 4 :
         printf("The answer to question 4 is a\n");
         break;
     case 5 :
-        printf("The answer to question 5 is k\n");
+        printf("The answer to question 5 is l\n");
         break;
     case 6 :
         printf("The answer to question 6 is g\n");
